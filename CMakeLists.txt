@@ -50,7 +50,8 @@ configure_file(${CMAKE_SOURCE_DIR}/config.json
         COPYONLY)
 
 add_executable(slim_guestbook_api main.cpp
-        include/ring_buffer.h)
+        include/ring_buffer.h
+        ring_buffer.cpp)
 
 target_include_directories(slim_guestbook_api
         PUBLIC
