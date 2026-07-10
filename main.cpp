@@ -3,6 +3,8 @@
 //
 
 #include <drogon/drogon.h>
+#include <algorithm>
+#include <cctype>
 #include <filesystem>
 #include <functional>
 #include <trantor/utils/ConcurrentTaskQueue.h>
@@ -89,15 +91,31 @@ void getPageHandler(const drogon::HttpRequestPtr& req,
     });
 }
 
+std::string trim(std::string value) {
+    const auto first = std::ranges::find_if(value, [](const unsigned char c) {
+        return !std::isspace(c);
+    });
+    value.erase(value.begin(), first);
+
+    const auto last = std::ranges::find_if(value.rbegin(), value.rend(), [](const unsigned char c) {
+        return !std::isspace(c);
+    });
+    value.erase(last.base(), value.end());
+
+    return value;
+}
+
+std::string firstForwardedHost(const std::string& xff) {
+    const auto comma = xff.find(',');
+    return trim(xff.substr(0, comma));
+}
+
 std::string extractPosterHostAddress(const drogon::HttpRequestPtr& req) {
     const std::string xff = req->getHeader("X-Forwarded-For");
     std::string reqHost = req->peerAddr().toIp();
 
-    if (!xff.empty()) {
-        // if the header contains a forwarder, and we trust the host, use that as the host
-        if (std::ranges::find(trustedHosts, xff) != trustedHosts.end()) {
-            reqHost = xff;
-        }
+    if (!xff.empty() && std::ranges::find(trustedHosts, reqHost) != trustedHosts.end()) {
+        reqHost = firstForwardedHost(xff);
     }
 
     return reqHost;
@@ -122,7 +140,12 @@ void postHandler(const drogon::HttpRequestPtr& req,
         return;
     }
 
-    if (!body->isMember("handle") || !body->isMember("message")) {
+    if (!body->isObject() ||
+        !body->isMember("handle") ||
+        !body->isMember("message") ||
+        !(*body)["handle"].isString() ||
+        !(*body)["message"].isString()) {
+
         callback(buildErrorResponse(drogon::HttpStatusCode::k400BadRequest, "invalid json."));
         return;
     }

@@ -105,6 +105,27 @@ target_include_directories(rate_limiter_tests
 
 add_test(NAME rate_limiter_tests COMMAND rate_limiter_tests)
 
+add_executable(post_handler_tests
+        tests/post_handler_tests.cpp
+        tests/test_framework.h
+        include/ring_buffer.h
+        ring_buffer.cpp
+        include/rate_limiter.h
+        rate_limiter.cpp
+        main.cpp)
+
+target_compile_definitions(post_handler_tests PRIVATE SLIM_GUESTBOOK_API_DISABLE_MAIN)
+
+target_include_directories(post_handler_tests
+        PRIVATE
+        include
+        tests
+)
+
+target_link_libraries(post_handler_tests PRIVATE Drogon::Drogon PRIVATE JsonCpp::JsonCpp)
+
+add_test(NAME post_handler_tests COMMAND post_handler_tests)
+
 add_executable(get_page_handler_tests
         tests/get_page_handler_tests.cpp
         tests/test_framework.h
