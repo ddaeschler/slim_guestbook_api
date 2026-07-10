@@ -8,6 +8,8 @@
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <vector>
+#include <string>
 
 namespace sgb_api::ring_buffer {
     constexpr std::uint32_t HANDLE_MAX_SIZE = 32;
@@ -18,8 +20,8 @@ namespace sgb_api::ring_buffer {
         std::uint32_t version = 1;
         std::uint32_t message_size = MESSAGE_MAX_SIZE;
         std::uint32_t handle_size = HANDLE_MAX_SIZE;
-        std::uint64_t max_entries = 10'000; // 1.6 MB
-        std::uint64_t count = 0;
+        std::uint32_t max_entries = 10'000; // 1.6 MB
+        std::uint32_t count = 0;
         std::uint64_t sequence = 0;
     };
 
@@ -47,7 +49,7 @@ namespace sgb_api::ring_buffer {
         void openExistingRingBuffer(const std::filesystem::path& ringBufferPath);
         void createNewRingBufferFile(const std::filesystem::path& ringBufferPath);
         void writeNext(const std::string& handle, const std::string& message);
-        void readPage(std::uint32_t pageNumber);
+        std::vector<Entry> readPage(std::uint32_t pageNumber);
 
     private:
         std::filesystem::path _parentPath;

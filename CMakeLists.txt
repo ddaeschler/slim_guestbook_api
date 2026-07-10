@@ -3,6 +3,7 @@ project(slim_guestbook_api)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+enable_testing()
 
 include(FetchContent)
 
@@ -59,3 +60,19 @@ target_include_directories(slim_guestbook_api
 )
 
 target_link_libraries(slim_guestbook_api PRIVATE Drogon::Drogon PRIVATE JsonCpp::JsonCpp)
+
+add_executable(ring_buffer_tests
+        tests/ring_buffer_tests.cpp
+        tests/test_framework.h
+        include/ring_buffer.h
+        ring_buffer.cpp)
+
+target_include_directories(ring_buffer_tests
+        PRIVATE
+        include
+        tests
+)
+
+target_link_libraries(ring_buffer_tests PRIVATE Drogon::Drogon)
+
+add_test(NAME ring_buffer_tests COMMAND ring_buffer_tests)

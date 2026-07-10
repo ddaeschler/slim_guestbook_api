@@ -4,9 +4,13 @@
 
 #include "include/ring_buffer.h"
 
+#include <algorithm>
+#include <cstring>
 #include <drogon/drogon.h>
 #include <fstream>
 #include <utility>
+#include <algorithm>
+#include <cstring>
 
 namespace sgb_api::ring_buffer {
 
@@ -40,6 +44,14 @@ namespace sgb_api::ring_buffer {
 
         if (testHeader.count > testHeader.max_entries) {
             throw std::runtime_error("Ring buffer header is corrupt: count > max_entries");
+        }
+
+        if (testHeader.max_entries == 0) {
+            throw std::runtime_error("Ring buffer header is corrupt: max_entries == 0");
+        }
+
+        if (testHeader.sequence < testHeader.count) {
+            throw std::runtime_error("Ring buffer header is corrupt: sequence < count");
         }
 
         _header = testHeader;
@@ -99,11 +111,46 @@ namespace sgb_api::ring_buffer {
         _ringBufferFile.flush();
     }
 
-    void RingBuffer::readPage(std::uint32_t pageNumber) {
+    std::vector<Entry> RingBuffer::readPage(std::uint32_t pageNumber) {
         // the page starts at the latest entry and works backwards.
-        // this means we may not be able to read a contiguous region, so just
+        // this means we may not be able to read a full/contiguous region, so just
         // read the entries one by one.
 
+        // first check boundary conditions
+        if (_header.count == 0 && pageNumber == 0) {
+            return std::vector<Entry>{};
+        }
+
+        if (_header.count == 0 && pageNumber > 0) {
+            throw std::runtime_error("Page number out of range");
+        }
+
+        // compute the record given by the page number
+        const auto pageOffset = pageNumber * PAGE_SIZE;
+
+        if (pageOffset >= _header.count) {
+            throw std::runtime_error("Page number out of range");
+        }
+
+        // we are either reading an entire page, or hitting the beginning of buffer
+        const auto readCount = std::min(PAGE_SIZE, _header.count - pageOffset);
+
+        // move to the front
+        const auto startPosition = _header.sequence - pageOffset - readCount;
+
+
+        std::vector<Entry> entries;
+        for (std::uint8_t i = 0; i < readCount; i++) {
+            const auto pos = (startPosition+i) % _header.max_entries;
+
+            Entry entry;
+            _ringBufferFile.seekg(static_cast<std::streamoff>(HEADER_SIZE + (pos * ENTRY_SIZE)), std::ios::beg);
+            _ringBufferFile.read(reinterpret_cast<char *>(&entry), ENTRY_SIZE);
+            entries.push_back(entry);
+        }
+
+        std::ranges::reverse(entries);
+        return entries;
     }
 
 }
