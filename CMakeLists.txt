@@ -76,3 +76,22 @@ target_include_directories(ring_buffer_tests
 target_link_libraries(ring_buffer_tests PRIVATE Drogon::Drogon)
 
 add_test(NAME ring_buffer_tests COMMAND ring_buffer_tests)
+
+add_executable(get_page_handler_tests
+        tests/get_page_handler_tests.cpp
+        tests/test_framework.h
+        include/ring_buffer.h
+        ring_buffer.cpp
+        main.cpp)
+
+target_compile_definitions(get_page_handler_tests PRIVATE SLIM_GUESTBOOK_API_DISABLE_MAIN)
+
+target_include_directories(get_page_handler_tests
+        PRIVATE
+        include
+        tests
+)
+
+target_link_libraries(get_page_handler_tests PRIVATE Drogon::Drogon PRIVATE JsonCpp::JsonCpp)
+
+add_test(NAME get_page_handler_tests COMMAND get_page_handler_tests)

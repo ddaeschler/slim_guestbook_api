@@ -8,6 +8,7 @@
 #include <cstring>
 #include <drogon/drogon.h>
 #include <fstream>
+#include <stdexcept>
 #include <utility>
 #include <algorithm>
 #include <cstring>
@@ -122,14 +123,14 @@ namespace sgb_api::ring_buffer {
         }
 
         if (_header.count == 0 && pageNumber > 0) {
-            throw std::runtime_error("Page number out of range");
+            throw std::range_error("Page number out of range");
         }
 
         // compute the record given by the page number
         const auto pageOffset = pageNumber * PAGE_SIZE;
 
         if (pageOffset >= _header.count) {
-            throw std::runtime_error("Page number out of range");
+            throw std::range_error("Page number out of range");
         }
 
         // we are either reading an entire page, or hitting the beginning of buffer
