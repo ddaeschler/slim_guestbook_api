@@ -146,3 +146,24 @@ target_include_directories(get_page_handler_tests
 target_link_libraries(get_page_handler_tests PRIVATE Drogon::Drogon PRIVATE JsonCpp::JsonCpp)
 
 add_test(NAME get_page_handler_tests COMMAND get_page_handler_tests)
+
+add_executable(cors_tests
+        tests/cors_tests.cpp
+        tests/test_framework.h
+        include/ring_buffer.h
+        ring_buffer.cpp
+        main.cpp
+        include/rate_limiter.h
+        rate_limiter.cpp)
+
+target_compile_definitions(cors_tests PRIVATE SLIM_GUESTBOOK_API_DISABLE_MAIN)
+
+target_include_directories(cors_tests
+        PRIVATE
+        include
+        tests
+)
+
+target_link_libraries(cors_tests PRIVATE Drogon::Drogon PRIVATE JsonCpp::JsonCpp)
+
+add_test(NAME cors_tests COMMAND cors_tests)

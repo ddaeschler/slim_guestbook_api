@@ -10,7 +10,10 @@
   },
   "custom_config": {
     "trusted_hosts": [
-
+      "127.0.0.1"
+    ],
+    "cors_allowed_hosts": [
+      "http://localhost:8080"
     ]
   }
 }
