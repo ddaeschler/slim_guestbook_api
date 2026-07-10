@@ -52,7 +52,9 @@ configure_file(${CMAKE_SOURCE_DIR}/config.json
 
 add_executable(slim_guestbook_api main.cpp
         include/ring_buffer.h
-        ring_buffer.cpp)
+        ring_buffer.cpp
+        include/rate_limiter.h
+        rate_limiter.cpp)
 
 target_include_directories(slim_guestbook_api
         PUBLIC
@@ -89,12 +91,28 @@ target_link_libraries(ring_buffer_tests PRIVATE Drogon::Drogon)
 
 add_test(NAME ring_buffer_tests COMMAND ring_buffer_tests)
 
+add_executable(rate_limiter_tests
+        tests/rate_limiter_tests.cpp
+        tests/test_framework.h
+        include/rate_limiter.h
+        rate_limiter.cpp)
+
+target_include_directories(rate_limiter_tests
+        PRIVATE
+        include
+        tests
+)
+
+add_test(NAME rate_limiter_tests COMMAND rate_limiter_tests)
+
 add_executable(get_page_handler_tests
         tests/get_page_handler_tests.cpp
         tests/test_framework.h
         include/ring_buffer.h
         ring_buffer.cpp
-        main.cpp)
+        main.cpp
+        include/rate_limiter.h
+        rate_limiter.cpp)
 
 target_compile_definitions(get_page_handler_tests PRIVATE SLIM_GUESTBOOK_API_DISABLE_MAIN)
 

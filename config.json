@@ -7,5 +7,10 @@
   ],
   "app": {
     "document_root": "./"
+  },
+  "custom_config": {
+    "trusted_hosts": [
+
+    ]
   }
 }

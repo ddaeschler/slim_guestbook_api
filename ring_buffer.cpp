@@ -94,6 +94,15 @@ namespace sgb_api::ring_buffer {
     }
 
     void RingBuffer::writeNext(const std::string& handle, const std::string& message) {
+        // check input sizes
+        if (handle.size() >= HANDLE_MAX_SIZE - 1) {
+            throw std::range_error("Handle size out of range");
+        }
+
+        if (message.size() >= MESSAGE_MAX_SIZE - 1) {
+            throw std::range_error("Message size out of range");
+        }
+
         const auto nextWritePos =
             HEADER_SIZE +
                 ((_header.sequence % _header.max_entries) * (_header.handle_size + _header.message_size));
