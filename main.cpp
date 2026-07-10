@@ -104,6 +104,17 @@ int main(int argc, char *argv[]) {
 
     activeBuffer.emplace(std::move(ringBuffer));
 
+    drogon::app().registerBeginningAdvice([] {
+        const auto listeners = drogon::app().getListeners();
+
+        for (const auto& addr : listeners) {
+            LOG_INFO << "Listening on "
+                     << addr.toIp()
+                     << ':'
+                     << addr.toPort();
+        }
+    });
+
     drogon::app().run();
     return 0;
 }

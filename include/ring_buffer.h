@@ -87,6 +87,14 @@ namespace sgb_api::ring_buffer {
         void open();
 
         /**
+         * @brief Open the existing buffer file at an exact path or create a new one.
+         *
+         * @param ringBufferPath Path to the ring buffer file.
+         * @throws std::runtime_error if the existing file is invalid or cannot be opened.
+         */
+        void openFile(const std::filesystem::path& ringBufferPath);
+
+        /**
          * @brief Open and validate an existing ring buffer file.
          *
          * @param ringBufferPath Path to the buffer file.

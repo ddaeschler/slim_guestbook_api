@@ -75,8 +75,7 @@ namespace sgb_api::ring_buffer {
         }
     }
 
-    void RingBuffer::open() {
-        std::filesystem::path ringBufferPath = _parentPath / std::filesystem::path("ring_buffer.bin");
+    void RingBuffer::openFile(const std::filesystem::path& ringBufferPath) {
         _ringBufferFile.exceptions(std::ios::failbit | std::ios::badbit);
 
         if (std::filesystem::exists(ringBufferPath)) {
@@ -88,6 +87,10 @@ namespace sgb_api::ring_buffer {
 
         createNewRingBufferFile(ringBufferPath);
         LOG_INFO << "Ring buffer file created with version " << _header.version;
+    }
+
+    void RingBuffer::open() {
+        openFile(_parentPath / std::filesystem::path("ring_buffer.bin"));
     }
 
     void RingBuffer::writeNext(const std::string& handle, const std::string& message) {

@@ -61,6 +61,18 @@ target_include_directories(slim_guestbook_api
 
 target_link_libraries(slim_guestbook_api PRIVATE Drogon::Drogon PRIVATE JsonCpp::JsonCpp)
 
+add_executable(ring_buffer_cli
+        ring_buffer_cli.cpp
+        include/ring_buffer.h
+        ring_buffer.cpp)
+
+target_include_directories(ring_buffer_cli
+        PRIVATE
+        include
+)
+
+target_link_libraries(ring_buffer_cli PRIVATE Drogon::Drogon)
+
 add_executable(ring_buffer_tests
         tests/ring_buffer_tests.cpp
         tests/test_framework.h
