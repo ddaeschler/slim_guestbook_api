@@ -40,7 +40,7 @@ COPY --from=builder /src/build/slim_guestbook_api /app/slim_guestbook_api
 COPY --from=builder /src/build/ring_buffer_cli /app/ring_buffer_cli
 COPY --from=builder /src/build/_deps/drogon-build/libdrogon.so.1.9.13 /usr/local/lib/
 COPY --from=builder /src/build/_deps/drogon-build/trantor/libtrantor.so.1.5.28 /usr/local/lib/
-COPY docker/config.json /config/config.json
+COPY config.json /config/config.json
 
 RUN mkdir -p /data \
  && ln -s /usr/local/lib/libdrogon.so.1.9.13 /usr/local/lib/libdrogon.so.1 \
