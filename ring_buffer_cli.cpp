@@ -22,7 +22,8 @@ namespace {
     void printUsage(std::ostream& out) {
         out << "Usage:\n"
             << "  ring_buffer_cli <ring-buffer-file> read <page-number>\n"
-            << "  ring_buffer_cli <ring-buffer-file> write <handle> <message>\n";
+            << "  ring_buffer_cli <ring-buffer-file> write <handle> <message>\n"
+            << "  ring_buffer_cli <ring-buffer-file> popLast\n";
     }
 
     std::uint32_t parsePageNumber(const std::string& value) {
@@ -85,12 +86,19 @@ namespace {
         return 0;
     }
 
+    int popLastEntry(const std::filesystem::path& ringBufferPath) {
+        auto buffer = openRingBuffer(ringBufferPath);
+        buffer.popLast();
+        std::cout << "Removed newest entry.\n";
+        return 0;
+    }
+
 }
 
 int main(int argc, char* argv[]) {
     trantor::Logger::setLogLevel(trantor::Logger::kWarn);
 
-    if (argc < 4) {
+    if (argc < 3) {
         printUsage(std::cerr);
         return 2;
     }
@@ -115,6 +123,15 @@ int main(int argc, char* argv[]) {
             }
 
             return writeEntry(ringBufferPath, argv[3], joinMessage(argc, argv, 4));
+        }
+
+        if (command == "popLast") {
+            if (argc != 3) {
+                printUsage(std::cerr);
+                return 2;
+            }
+
+            return popLastEntry(ringBufferPath);
         }
 
         printUsage(std::cerr);

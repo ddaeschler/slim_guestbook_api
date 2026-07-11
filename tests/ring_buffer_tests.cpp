@@ -118,6 +118,20 @@ TEST_CASE("exact page boundary rejects one past the last page") {
     REQUIRE_THROWS(buffer.readPage(2));
 }
 
+TEST_CASE("popLast removes newest entry from readable pages") {
+    TempDirectory temp;
+    auto buffer = openBuffer(temp.path);
+
+    for (int i = 0; i < 4; ++i) {
+        writeEntry(buffer, i);
+    }
+
+    buffer.popLast();
+
+    requireMessages(buffer.readPage(0), {"m2", "m1", "m0"});
+    REQUIRE_THROWS(buffer.readPage(1));
+}
+
 TEST_CASE("wrapped buffer returns newest and oldest retained pages") {
     TempDirectory temp;
     auto buffer = openBuffer(temp.path);

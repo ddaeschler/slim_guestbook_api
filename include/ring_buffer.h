@@ -133,6 +133,16 @@ namespace sgb_api::ring_buffer {
          */
         std::vector<Entry> readPage(std::uint32_t pageNumber);
 
+        /**
+         * @brief Remove the newest retained guestbook entry.
+         *
+         * This only updates the persisted header counters; the entry bytes remain
+         * in the backing file but are no longer returned by readPage().
+         *
+         * The buffer must contain at least one entry before this is called.
+         */
+        void popLast();
+
     private:
         std::filesystem::path _parentPath;
         std::fstream _ringBufferFile;

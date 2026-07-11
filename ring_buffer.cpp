@@ -124,6 +124,15 @@ namespace sgb_api::ring_buffer {
         _ringBufferFile.flush();
     }
 
+    void RingBuffer::popLast() {
+        _header.sequence--;
+        _header.count--;
+
+        _ringBufferFile.seekp(0, std::ios::beg);
+        _ringBufferFile.write(reinterpret_cast<char *>(&_header), HEADER_SIZE);
+        _ringBufferFile.flush();
+    }
+
     std::vector<Entry> RingBuffer::readPage(std::uint32_t pageNumber) {
         // the page starts at the latest entry and works backwards.
         // this means we may not be able to read a full/contiguous region, so just
