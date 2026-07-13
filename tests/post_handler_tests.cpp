@@ -155,9 +155,37 @@ TEST_CASE("postHandler rejects non-string fields") {
 TEST_CASE("postHandler rejects oversized handle or message") {
     HandlerFixture fixture;
 
-    const std::string oversizedHandle(sgb_api::ring_buffer::HANDLE_MAX_SIZE - 1, 'h');
+    const std::string oversizedHandle(sgb_api::ring_buffer::HANDLE_MAX_SIZE, 'h');
 
     const auto response = invokePostHandler(jsonRequest(validBody(oversizedHandle, "hello")));
+
+    REQUIRE(response->getStatusCode() == drogon::HttpStatusCode::k400BadRequest);
+    REQUIRE(response->getBody() == "handle or message too large.");
+    REQUIRE(readFirstPage().empty());
+}
+
+TEST_CASE("postHandler accepts maximum persisted handle and message sizes") {
+    HandlerFixture fixture;
+
+    const std::string maxHandle(sgb_api::ring_buffer::HANDLE_MAX_SIZE - 1, 'h');
+    const std::string maxMessage(sgb_api::ring_buffer::MESSAGE_MAX_SIZE - 1, 'm');
+
+    const auto response = invokePostHandler(jsonRequest(validBody(maxHandle, maxMessage)));
+
+    REQUIRE(response->getStatusCode() == drogon::HttpStatusCode::k200OK);
+
+    const auto page = readFirstPage();
+    REQUIRE(page.size() == 1);
+    REQUIRE(std::string(page[0].handle) == maxHandle);
+    REQUIRE(std::string(page[0].message) == maxMessage);
+}
+
+TEST_CASE("postHandler rejects oversized message") {
+    HandlerFixture fixture;
+
+    const std::string oversizedMessage(sgb_api::ring_buffer::MESSAGE_MAX_SIZE, 'm');
+
+    const auto response = invokePostHandler(jsonRequest(validBody("alice", oversizedMessage)));
 
     REQUIRE(response->getStatusCode() == drogon::HttpStatusCode::k400BadRequest);
     REQUIRE(response->getBody() == "handle or message too large.");

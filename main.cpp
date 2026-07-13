@@ -278,8 +278,8 @@ void postHandler(const drogon::HttpRequestPtr& req,
     const auto handle = body->get("handle", "").asString();
     const auto message = body->get("message", "").asString();
 
-    if (handle.size() >= sgb_api::ring_buffer::HANDLE_MAX_SIZE - 1 ||
-        message.size() >= sgb_api::ring_buffer::MESSAGE_MAX_SIZE - 1) {
+    if (handle.size() >= sgb_api::ring_buffer::HANDLE_MAX_SIZE ||
+        message.size() >= sgb_api::ring_buffer::MESSAGE_MAX_SIZE) {
 
         const auto response = buildErrorResponse(drogon::HttpStatusCode::k400BadRequest, "handle or message too large.");
         applyCorsHeaders(req, response);
